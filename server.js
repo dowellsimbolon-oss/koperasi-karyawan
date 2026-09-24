@@ -198,3 +198,4 @@ app.put('/api/user/profile', authenticateToken, (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server Back-End Koperasi berjalan di: http://localhost:${PORT}`);
 });
+module.exports = app;
