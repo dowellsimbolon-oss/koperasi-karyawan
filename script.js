@@ -28,7 +28,7 @@ async function handleLogin(event) {
     const password = document.getElementById("password").value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+       fetch(`${API_BASE_URL}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nik, password })
