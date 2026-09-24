@@ -1,5 +1,5 @@
 // Konfigurasi URL Base REST API Back-End Node.js
-const API_BASE_URL = 'https://koperasi-karyawan-ivia-o6os3rf3x-frans-dowell.vercel.app';
+const API_BASE_URL = 'https://koperasi-karyawan.vercel.app'; 
 
 let chartInstance = null;
 
