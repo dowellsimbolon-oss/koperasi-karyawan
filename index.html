@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Koperasi & Payroll Deduction</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- ================= HALAMAN LOGIN ================= -->
+    <div id="login-view" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-university login-logo"></i>
+                <h2>Koperasi Karyawan</h2>
+                <p>PT. Theo Marhara Abadi</p>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="nik"><i class="fas fa-id-card"></i> Username / Nomor Anggota</label>
+                    <input type="text" id="nik" placeholder="Masukkan NIK (contoh: 123456)" value="123456" required>
+                </div>
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="password" placeholder="Masukkan kata sandi" value="user123" required>
+                </div>
+                <button type="submit" class="btn-primary btn-block"><i class="fas fa-sign-in-alt"></i> Login/Masuk</button>
+            </form>
+            <div class="login-footer"></div>
+        </div>
+    </div>
+
+    <!-- ================= APLIKASI UTAMA ================= -->
+    <div id="app-view" class="app-container hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-university"></i>
+                <span>KoperasiKu</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                <li><a href="#" onclick="switchTab('simpanan')" id="nav-simpanan"><i class="fas fa-piggy-bank"></i> Data Simpanan</a></li>
+                <li><a href="#" onclick="switchTab('pinjaman')" id="nav-pinjaman"><i class="fas fa-hand-holding-usd"></i> Pengajuan Pinjaman</a></li>
+                <li><a href="#" onclick="switchTab('payroll')" id="nav-payroll"><i class="fas fa-file-invoice-dollar"></i> Payroll Deduction</a></li>
+                <li><a href="#" onclick="switchTab('profil')" id="nav-profil"><i class="fas fa-user-cog"></i> Profil Anggota</a></li>
+                
+                <!-- Menu khusus Bendahara & Pengurus -->
+                <li id="nav-admin" style="display: none;">
+                    <a href="#" onclick="switchTab('admin')"><i class="fas fa-user-shield"></i> Panel Admin</a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button onclick="handleLogout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Log Keluar</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="welcome-text">
+                    <h2 id="user-greeting">Selamat Datang</h2>
+                    <span id="user-nik-badge" class="badge">NIK: KOP-2026-089</span>
+                </div>
+                <div class="user-avatar-badge">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <div class="user-detail">
+                        <strong id="header-user-name">-</strong>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-content active">
+                <div class="cards-grid">
+                    <div class="card bg-blue">
+                        <div class="card-icon"><i class="fas fa-wallet"></i></div>
+                        <div class="card-data">
+                            <span>Total Simpanan</span>
+                            <h3 id="dash-total-simpanan">Rp 0</h3>
+                        </div>
+                    </div>
+                    <div class="card bg-orange">
+                        <div class="card-icon"><i class="fas fa-receipt"></i></div>
+                        <div class="card-data">
+                            <span>Sisa Pinjaman Active</span>
+                            <h3 id="dash-sisa-pinjaman">Rp 0</h3>
+                        </div>
+                    </div>
+                    <div class="card bg-red">
+                        <div class="card-icon"><i class="fas fa-cut"></i></div>
+                        <div class="card-data">
+                            <span>Potongan Payroll Bulan Ini</span>
+                            <h3 id="dash-payroll-cut">Rp 0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts">
+                    <div class="content-box">
+                        <h3><i class="fas fa-chart-line"></i> Grafik Perkembangan Keuangan</h3>
+                        <canvas id="financeChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: SIMPANAN -->
+            <section id="tab-simpanan" class="tab-content">
+                <div class="section-header">
+                    <h2>Rincian & Transaksi Simpanan</h2>
+                    <button class="btn-primary" onclick="openModalSimpanan()"><i class="fas fa-plus-circle"></i> Transaksi Simpanan</button>
+                </div>
+
+                <div class="cards-grid simpanan-types">
+                    <div class="card-small">
+                        <span>Simpanan Pokok</span>
+                        <h4 id="val-simpanan-pokok">Rp 0</h4>
+                    </div>
+                    <div class="card-small">
+                        <span>Simpanan Wajib</span>
+                        <h4 id="val-simpanan-wajib">Rp 0</h4>
+                    </div>
+                    <div class="card-small">
+                        <span>Simpanan Sukarela</span>
+                        <h4 id="val-simpanan-sukarela">Rp 0</h4>
+                    </div>
+                </div>
+
+                <div class="content-box">
+                    <h3>Riwayat Mutasi Simpanan</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis</th>
+                                <th>Keterangan</th>
+                                <th>Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-simpanan-body">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 3: PINJAMAN -->
+            <section id="tab-pinjaman" class="tab-content">
+                <div class="grid-2-cols">
+                    <!-- Calculator Pinjaman -->
+                    <div class="content-box">
+                        <h3><i class="fas fa-calculator"></i> Kalkulator Simulasi Pinjaman</h3>
+                        <form id="loan-calc-form" onsubmit="submitPinjaman(event)">
+                            <div class="form-group">
+                                <label>Jumlah Pinjaman (Rp):</label>
+                                <input type="number" id="calc-amount" min="1000000" max="50000000" value="6000000" oninput="updateLoanCalc()" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tenor (Bulan):</label>
+                                <select id="calc-tenor" onchange="updateLoanCalc()">
+                                    <option value="6">6 Bulan</option>
+                                    <option value="12" selected>12 Bulan</option>
+                                    <option value="24">24 Bulan</option>
+                                    <option value="36">36 Bulan</option>
+                                </select>
+                            </div>
+                            <div class="calc-results">
+                                <p>Bunga Flat/Bulan: <strong>1.0%</strong></p>
+                                <p>Angsuran Per Bulan: <span id="calc-installment" class="highlight-text">Rp 0</span></p>
+                            </div>
+                            <div class="form-group">
+                                <label>Tujuan Pinjaman:</label>
+                                <textarea id="calc-reason" rows="2" placeholder="Sebutkan keperluan pengajuan..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary btn-block"><i class="fas fa-paper-plane"></i> Ajukan Pinjaman Sekarang</button>
+                        </form>
+                    </div>
+
+                    <!-- Status Pinjaman Aktif -->
+                    <div class="content-box">
+                        <h3><i class="fas fa-file-contract"></i> Riwayat & Status Pengajuan</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Jumlah</th>
+                                    <th>Tenor</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-pinjaman-body">
+                                <!-- Injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: PAYROLL DEDUCTION -->
+            <section id="tab-payroll" class="tab-content">
+                <div class="content-box payroll-box">
+                    <div class="payroll-header">
+                        <h2>Slip Potongan Gaji (Payroll Deduction)</h2>
+                        <span class="badge badge-success">Periode: September 2026</span>
+                    </div>
+                    <hr>
+                    <div class="payroll-details">
+                        <p><strong>Nama Karyawan:</strong> <span id="pay-name">-</span></p>
+                        <p><strong>NIK / ID:</strong> KOP-2026-089</p>
+                        <p><strong>Departemen:</strong> Informatics Engineering</p>
+                    </div>
+
+                    <table class="payroll-table">
+                        <thead>
+                            <tr>
+                                <th>Item Pemotongan</th>
+                                <th class="text-right">Jumlah (Rp)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Simpanan Wajib Bulanan</td>
+                                <td class="text-right">Rp 100.000</td>
+                            </tr>
+                            <tr>
+                                <td>Cicilan Pinjaman Syariah (Angsuran Ke-4 dari 12)</td>
+                                <td class="text-right">Rp 750.000</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td>Total Potongan Payroll Bulan Ini</td>
+                                <td class="text-right text-danger" id="pay-total-val">Rp 0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="payroll-actions">
+                        <button onclick="window.print()" class="btn-secondary"><i class="fas fa-print"></i> Cetak Slip Potongan</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: PROFIL -->
+            <section id="tab-profil" class="tab-content">
+                <div class="content-box">
+                    <h3><i class="fas fa-user-edit"></i> Pengaturan Profil Anggota</h3>
+                    <form onsubmit="saveProfile(event)" class="profile-form">
+                        <div class="form-group">
+                            <label>Nama Lengkap:</label>
+                            <input type="text" id="prof-name" placeholder="Nama Lengkap" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email ID:</label>
+                            <input type="email" id="prof-email" placeholder="Email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor Telepon:</label>
+                            <input type="text" id="prof-phone" placeholder="Nomor Telepon" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor Rekening Bank (Pencairan):</label>
+                            <input type="text" id="prof-bank" placeholder="Nama Bank & No Rekening" required>
+                        </div>
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Simpan Perubahan Profil</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 6: ADMIN PANEL -->
+            <section id="tab-admin" class="tab-content">
+                <div class="content-box">
+                    <h2><i class="fas fa-user-shield"></i> Panel Kelola Koperasi</h2>
+                    <p>Halaman khusus untuk Pengurus dan Bendahara.</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ================= MODAL DEPOSIT / WITHDRAW ================= -->
+    <div id="simpanan-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModalSimpanan()">&times;</span>
+            <h3>Transaksi Simpanan Sukarela</h3>
+            <form onsubmit="handleTransactionSimpanan(event)">
+                <div class="form-group">
+                    <label>Jenis Transaksi:</label>
+                    <select id="modal-type">
+                        <option value="SETOR">Setor Simpanan Sukarela</option>
+                        <option value="TARIK">Tarik Simpanan Sukarela</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nominal (Rp):</label>
+                    <input type="number" id="modal-amount" min="10000" placeholder="Contoh: 500000" required>
+                </div>
+                <div class="form-group">
+                    <label>Keterangan:</label>
+                    <input type="text" id="modal-note" placeholder="Contoh: Setor Tabungan Bulanan" required>
+                </div>
+                <button type="submit" class="btn-primary btn-block">Proses Transaksi</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
